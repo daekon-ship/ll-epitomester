@@ -65,8 +65,7 @@
         <a href="#rolunk">Rólunk</a>
         <a href="#gyik">GYIK</a>
         <a class="nav__cta" href="#kapcsolat">Ajánlatot kérek</a>
-      </nav>
-      <button class="burger" id="burger" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="nav">
+      </nav>        <button class="burger" id="burger" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="nav">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -280,7 +279,7 @@
           </p>
         </header>
 
-        <div class="filter reveal" role="tablist" aria-label="Referenciák szűrése">
+        <div class="filter reveal" role="group" aria-label="Referenciák szűrése">
           <button class="filter__btn is-active" data-filter="all">Összes</button>
           <button class="filter__btn" data-filter="burkolas">Burkolás</button>
           <button class="filter__btn" data-filter="terkoz">Térkövezés</button>
@@ -661,7 +660,7 @@
   </footer>
 
   <!-- Vissza a tetejére -->
-  <button class="totop" id="totop" data-icon="arrow-up" aria-label="Vissza a tetejére"></button>
+  <button class="totop" id="totop" type="button" data-icon="arrow-up" aria-label="Vissza a tetejére"></button>
 
   <!-- Sticky mobil CTA -->
   <div class="mobcta" id="mobcta" aria-label="Gyors kapcsolatfelvétel">
@@ -670,7 +669,7 @@
   </div>
 
   <!-- Lightbox -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Kép nagyítva" hidden>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Nagyított kép" hidden>
     <button class="lightbox__close" id="lightboxClose" aria-label="Bezárás">×</button>
     <div class="lightbox__stage" id="lightboxStage"></div>
     <p class="lightbox__caption" id="lightboxCaption"></p>

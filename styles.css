@@ -88,7 +88,7 @@ h2 { font-size: clamp(30px, 4.2vw, 48px); font-weight: 800; }
 /* ---------- Buttons ---------- */
 .btn {
   --btn-bg: var(--ink); --btn-fg: var(--paper);
-  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   padding: 15px 26px; border-radius: 999px;
   background: var(--btn-bg); color: var(--btn-fg);
   font-weight: 600; font-size: 15.5px; letter-spacing: 0.01em;
@@ -460,10 +460,12 @@ h2 { font-size: clamp(30px, 4.2vw, 48px); font-weight: 800; }
 .ph-hatch { position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, rgba(253, 252, 251, 0.05) 0 2px, transparent 2px 16px); }
 .ph-hatch--diag { background-image: repeating-linear-gradient(45deg, rgba(201, 100, 53, 0.1) 0 2px, transparent 2px 16px); }
 
-/* --- Film grain textúra a sötét szekciókra --- */
-.section--dark, .cta-band, .footer { position: relative; }
+/* --- Film grain textúra a sötét szekciókra ---
+   Az isolation biztosítja, hogy a -1 z-indexű réteg a háttér és a tartalom
+   közé kerüljön, és ne fedje az interaktív elemeket. */
+.section--dark, .cta-band, .footer { position: relative; isolation: isolate; }
 .section--dark::after, .cta-band::after, .footer::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.05;
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.05; z-index: -1;
   background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter><rect width="140" height="140" filter="url(%23n)" opacity="0.6"/></svg>');
 }
 
@@ -687,6 +689,7 @@ h2 { font-size: clamp(30px, 4.2vw, 48px); font-weight: 800; }
   background: rgba(10, 12, 15, 0.92); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   opacity: 0; transition: opacity 0.35s;
 }
+.lightbox[hidden] { display: none; }
 .lightbox.is-open { opacity: 1; }
 .lightbox__stage { width: min(1080px, 100%); aspect-ratio: 16 / 10; }
 .lightbox__stage .photo-slot, .lightbox__stage .media-clone { height: 100%; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); cursor: default; }

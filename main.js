@@ -67,6 +67,7 @@
       const open = nav.classList.toggle("is-open");
       burger.classList.toggle("is-open", open);
       burger.setAttribute("aria-expanded", String(open));
+      burger.setAttribute("aria-label", open ? "Menü bezárása" : "Menü megnyitása");
       document.body.style.overflow = open ? "hidden" : "";
       document.body.classList.toggle("nav-open", open);
     });
@@ -122,13 +123,19 @@
     spyTargets.forEach((t) => spy.observe(t));
   }
 
-  /* ---------- Referenciaszűrő ---------- */
-  const filterBtns = document.querySelectorAll(".filter__btn");
+  /* ---------- Referenciaszűrő (aria-pressed toggle gombokkal) ---------- */
+  const filterBtns = [...document.querySelectorAll(".filter__btn")];
   const refCards = document.querySelectorAll("#refGrid .ref-card");
   filterBtns.forEach((btn) => {
+    btn.setAttribute("type", "button");
+    btn.setAttribute("aria-pressed", btn.classList.contains("is-active") ? "true" : "false");
     btn.addEventListener("click", () => {
-      filterBtns.forEach((b) => b.classList.remove("is-active"));
+      filterBtns.forEach((b) => {
+        b.classList.remove("is-active");
+        b.setAttribute("aria-pressed", "false");
+      });
       btn.classList.add("is-active");
+      btn.setAttribute("aria-pressed", "true");
       const f = btn.getAttribute("data-filter");
       refCards.forEach((card) => {
         const show = f === "all" || card.getAttribute("data-cat") === f;
@@ -158,7 +165,7 @@
     let dragging = false;
     ba.addEventListener("pointerdown", (e) => { dragging = true; ba.setPointerCapture && ba.setPointerCapture(e.pointerId); fromEvent(e); });
     ba.addEventListener("pointermove", (e) => { if (dragging) fromEvent(e); });
-    ["pointerup", "pointercancel", "pointerleave"].forEach((ev) => ba.addEventListener(ev, () => { dragging = false; }));
+    ["pointerup", "pointercancel"].forEach((ev) => ba.addEventListener(ev, () => { dragging = false; }));
     handle.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") { setPos(pos - 4); e.preventDefault(); }
       if (e.key === "ArrowRight") { setPos(pos + 4); e.preventDefault(); }
@@ -171,35 +178,60 @@
   const stage = document.getElementById("lightboxStage");
   const captionEl = document.getElementById("lightboxCaption");
   const closeBtn = document.getElementById("lightboxClose");
+  let lightboxOpener = null;
+  let lbToken = 0; /* versenyhelyzet-védelem: gyors nyit-zár nyit sorrendeknél */
 
   const openLightbox = (media) => {
     if (!lightbox || !stage) return;
+    lbToken++;
+    const myToken = lbToken;
+    lightboxOpener = media;
     const clone = media.cloneNode(true);
     clone.removeAttribute("data-lightbox");
     clone.classList.add("media-clone");
     clone.style.cursor = "default";
+    clone.removeAttribute("tabindex");
+    clone.removeAttribute("role");
     clone.querySelectorAll(".media__zoom").forEach((z) => z.remove());
     stage.innerHTML = "";
     stage.appendChild(clone);
     const t = media.querySelector("h3");
     if (captionEl) captionEl.textContent = t ? t.textContent : "";
     lightbox.hidden = false;
-    requestAnimationFrame(() => lightbox.classList.add("is-open"));
+    requestAnimationFrame(() => { if (myToken === lbToken && !lightbox.hidden) lightbox.classList.add("is-open"); });
     document.body.style.overflow = "hidden";
     closeBtn && closeBtn.focus();
   };
   const closeLightbox = () => {
-    if (!lightbox) return;
+    if (!lightbox || lightbox.hidden) return;
+    lbToken++;
+    const myToken = lbToken;
     lightbox.classList.remove("is-open");
     document.body.style.overflow = "";
-    setTimeout(() => { lightbox.hidden = true; if (stage) stage.innerHTML = ""; }, 320);
+    setTimeout(() => {
+      if (myToken !== lbToken) return; /* közben újranyitották */
+      lightbox.hidden = true;
+      if (stage) stage.innerHTML = "";
+    }, 320);
+    if (lightboxOpener) { lightboxOpener.focus(); lightboxOpener = null; }
   };
   document.querySelectorAll(".media[data-lightbox]").forEach((m) => {
+    m.setAttribute("tabindex", "0");
+    m.setAttribute("role", "button");
+    const label = m.querySelector("h3");
+    m.setAttribute("aria-label", "Nagyítás: " + (label ? label.textContent : "kép"));
     m.addEventListener("click", () => openLightbox(m));
+    m.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(m); }
+    });
   });
   if (lightbox) {
     lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-    window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !lightbox.hidden) closeLightbox(); });
+    window.addEventListener("keydown", (e) => {
+      if (lightbox.hidden) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "Tab" && closeBtn) { e.preventDefault(); closeBtn.focus(); }
+    });
     closeBtn && closeBtn.addEventListener("click", closeLightbox);
   }
 
@@ -241,31 +273,7 @@
   });
 
   /* ---------- Szűrő: ARIA állapotok ---------- */
-  filterBtns.forEach((btn, i) => {
-    btn.setAttribute("role", "tab");
-    btn.setAttribute("aria-selected", btn.classList.contains("is-active") ? "true" : "false");
-    btn.setAttribute("tabindex", btn.classList.contains("is-active") ? "0" : "-1");
-    btn.addEventListener("click", () => {
-      filterBtns.forEach((b) => {
-        b.setAttribute("aria-selected", "false");
-        b.setAttribute("tabindex", "-1");
-      });
-      btn.setAttribute("aria-selected", "true");
-      btn.setAttribute("tabindex", "0");
-    });
-    void i;
-  });
-
-  /* ---------- Before/After billentyűzet-összpontosítás ---------- */
-  document.querySelectorAll("[data-ba]").forEach((ba) => {
-    ba.setAttribute("tabindex", "0");
-    ba.addEventListener("keydown", (e) => {
-      const handle = ba.querySelector(".ba__handle");
-      if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && document.activeElement !== handle) {
-        handle && handle.focus();
-      }
-    });
-  });
+  /* (a filter gombok aria-pressed állapotát a fenti szűrő-blokk kezeli) */
 
   /* ---------- Űrlap: mailto-előkészítés ---------- */
   const form = document.getElementById("offerForm");
