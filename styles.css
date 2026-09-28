@@ -215,7 +215,7 @@ h2 { font-size: clamp(30px, 4.2vw, 48px); font-weight: 800; }
   align-items: center; gap: clamp(36px, 5vw, 72px);
   padding-block: clamp(56px, 8vw, 110px) clamp(64px, 9vw, 120px);
 }
-.hero__title { font-size: clamp(38px, 5.6vw, 68px); font-weight: 800; margin-bottom: 24px; }
+.hero__title { font-size: clamp(36px, 4.2vw, 54px); font-weight: 800; margin-bottom: 24px; }
 .hero__title em { font-style: normal; color: var(--accent); position: relative; white-space: nowrap; }
 .hero__title em::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0.08em; height: 0.14em;
@@ -766,6 +766,10 @@ h2 { font-size: clamp(30px, 4.2vw, 48px); font-weight: 800; }
 @media (max-width: 720px) {
   body { font-size: 15.5px; }
   .container { width: min(var(--container), 100% - 40px); }
+  .about__stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .about__stat { padding: 12px 6px; }
+  .about__stat strong { font-size: 14px; }
+  .about__stat small { font-size: 11px; }
   .hero__cue { display: none; }
   .mobcta { padding-bottom: env(safe-area-inset-bottom); bottom: calc(10px + env(safe-area-inset-bottom)); }
   .topbar__note { display: none; }
