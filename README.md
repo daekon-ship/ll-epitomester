@@ -3,6 +3,8 @@
 Modern, gyors, statikus egyoldalas bemutatkozó oldal a **L+L Építőmester** számára.
 Nincs build-lépés és nincs függőség: tiszta HTML + CSS + JavaScript.
 
+**Élő oldal:** https://daekon-ship.github.io/ll-epitomester/
+
 ## Fájlok
 
 | Fájl | Szerep |
